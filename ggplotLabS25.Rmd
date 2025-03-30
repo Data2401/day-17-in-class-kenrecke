@@ -114,7 +114,7 @@ Let's look at the democratic vote by state for 2000. We can't use `geom_bar` for
 Make a bar graph of the democratic vote by state in 2000. 
 
 ```{r}
-
+v <- votedata %>% ggplot(aes(x = state)) + geom_col(aes(y = demVote))
 
 
 ```
@@ -124,6 +124,7 @@ Well this looks awful. We have two options: swap the x and y or the more fun sou
 Use `coord_flip()` on the previous graph to make it better. 
 
 ```{r fig.height=7, fig.width=5}
+votedata %>% ggplot(aes(x = state)) + geom_col(aes(y = demVote)) + coord_flip()
 
 
 
@@ -136,7 +137,7 @@ Use `x = reorder(x_variable, y_variable)` in `aes()` to order the x variable by 
 
 ```{r}
 
-
+votedata %>% ggplot(aes(x = state)) + geom_col(aes(y = demVote, x = reorder(state, demVote))) + coord_flip()
 
 ```
 
@@ -145,28 +146,28 @@ So, what if I want to see what the north and south states did different?
 start with a facet_wrap using the `south` variable:
 
 ```{r}
-
+votedata %>% ggplot(aes(x = state)) + geom_col(aes(y = demVote, x= reorder(state, demVote))) + coord_flip() + facet_wrap(~ south)
 
 ```
 
 Okay, that's not great. Lets *color* by south instead.
 
 ```{r}
-
+votedata %>% ggplot(aes(x = state)) + geom_col(aes(y = demVote, x= reorder(state, demVote), color = state)) + coord_flip()
 
 ```
 
 I'm a good data scientist, so I want my plot to have a name! and my axes to have lables! Use `labs` to add a title, subtitle, and x and y labels.
 
 ```{r, eval = F}
-
+votedata %>% ggplot(aes(x = state)) + geom_col(aes(y = demVote, x= reorder(state, demVote, color = state))) + coord_flip() + labs(title = "Voting Date", subtitle = "Democratic Votes per State", xlab = "Votes", ylab = "State")
 
 ```
 
 You can move the legend with `theme(legend.position = "bottom")`
 
 ```{r, eval = F}
-
+votedata %>% ggplot(aes(x = state)) + geom_col(aes(y = demVote, x= reorder(state, demVote, color = state))) + coord_flip() + labs(title = "Voting Date", subtitle = "Democratic Votes per State", xlab = "Votes", ylab = "State") + theme(legend.position = "bottom")
 
 
 ```
@@ -175,14 +176,14 @@ What else could we facet by? years! Let's filter to year in 2008 and 2016, then 
 
 ```{r}
 
-
+votedata %>% ggplot(aes(x = state)) + geom_col(aes(y = demVote, x= reorder(state, demVote, color = state))) + coord_flip() + labs(title = "Voting Date", subtitle = "Democratic Votes per State", xlab = "Votes", ylab = "State") + facet_wrap(~ year)
 
 ```
 
 We need to know who won! We could add a vertical line at 50 for who got more, to indicate the majority of votes. Adding the layer `geom_hline()` adds a horizontal line. (What do you guess `geom_vline()` would do?)
 
 ```{r}
-
+ggplot(votedata, aes(x = state)) + geom_col(aes(y = demVote, x= reorder(state, demVote, color = state), geom_vline(50))) + coord_flip() + labs(title = "Voting Date", subtitle = "Democratic Votes per State", xlab = "Votes", ylab = "State") + facet_wrap(~ year) 
 
 ```
 
@@ -219,7 +220,10 @@ map_plot
 What if I want a map that shows which of the states are "south"? What do I change?
 
 ```{r}
-
+map_plot <-  ggplot(data =  votedata %>% filter(south == TRUE), aes(map_id = state)) +
+  geom_map(aes(fill = demVote), map = states_map)+
+  expand_limits(x = states_map$long, y = states_map$lat)
+map_plot 
 
 ```
 
